@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width =device-width, initial-scale=1" charset="UTF-8">
+    <link rel="icon" href="data:,">
+    <script src="/lib/plotly-latest.min.js"></script>
+    <style></style>
+</head>
+<body>
+    <h1>WebBake</h1>
+    <div class="ct-chart ct-perfect-fourth" id="temps"></div>
+    <label id="lblPhase"></label>
+    <script>
+    (async () => {
+        var resp = await fetch('/data');
+        result = await resp.json();
+        var tcTop = {
+            x: result.time,
+            y: result.tcTop,
+            mode: 'lines',
+            type: 'scatter',
+            name: 'Top Thermocouple'
+        };
+        var tcBot = {
+            x: result.time,
+            y: result.tcBottom,
+            mode: 'lines',
+            type: 'scatter',
+            name: 'Bottom Thermocouple'
+        };
+        var ptTop = {
+            x: result.time,
+            y: result.ptTop,
+            mode: 'lines',
+            type: 'scatter',
+            name: 'Top PT'
+        };
+        var ptBot = {
+            x: result.time,
+            y: result.ptBottom,
+            mode: 'lines',
+            type: 'scatter',
+            name: 'Bottom PT'
+        };
+        var data = [tcTop, tcBot, ptTop, ptBot];
+        var layout = {
+            xaxis: {
+                type: 'linear',
+                title: 'Seconds since Power Up'
+            },
+            yaxis: {
+                title: '°C'
+            },
+            title:'Temperature'
+        };
+        Plotly.newPlot('temps', data, layout);
+        document.getElementById('lblPhase').innerHTML = data.phase;
+    })();
+
+    function sendStart() {
+        fetch('/start');
+    }
+    function sendStop() {
+        fetch('/stop');
+    }
+    function sendSettings() {
+        var settings = document.getElementsByClassName('setting');
+        var params = '';
+        for (var i = 0; i < settings.length; ++i) {
+            params += settings[i].name;
+            params += '=';
+            params += settings[i].value;
+            params += '&';
+        };
+        fetch('/settings?' + params, 
+        {
+            method: 'GET',
+            mode: "cors", // no-cors, cors, *same-origin
+            cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: "same-origin", // include, *same-origin, omit
+            headers: {
+                "Content-Type": "text/plain; charset=utf-8"
+            },
+            redirect: "manual",
+            referrer: "no-referrer"
+        });
+    }
+    </script>
+    <button onclick="sendStart();">Start</button>
+    <button onclick="sendStop();">Stop</button>
+    <table>
+        <tr>
+            <td>
+                Soak Time:
+            </td>
+            <td>
+                <input type="number" name="soakSeconds" value="100" class="setting"/>
+            </td>
+            <td>s</td>
+        </tr>
+        <tr>
+            <td>
+                Soak start at:
+            </td>
+            <td>
+                <input type="number" name="soakStartTemp" value="140" class="setting"/>
+            </td>
+            <td>°C</td>
+        </tr>
+        <tr>
+            <td>
+                Soak Max:
+            </td>
+            <td>
+                <input type="number" name="soakMaxTemp" value="160" class="setting"/>
+            </td>
+            <td>°C</td>
+        </tr>
+        <tr>
+            <td>
+                Reflow Time:
+            </td>
+            <td>
+                <input type="number" name="reflowSeconds" value="80" class="setting"/>
+            </td>
+            <td>s</td>
+        </tr>
+        <tr>
+            <td>
+                Reflow start:
+            </td>
+            <td>
+                <input type="number" name="reflowStartTemp" value="180" class="setting"/>
+            </td>
+            <td>°C</td>
+        </tr>
+        <tr>
+            <td>
+                Reflow min:
+            </td>
+            <td>
+                <input type="number" name="reflowMinTemp" value="205" class="setting"/>
+            </td>
+            <td>°C</td>
+        </tr>
+        <tr>
+            <td>
+                Reflow max:
+            </td>
+            <td>
+                <input type="number" name="reflowMaxTemp" value="220" class="setting"/>
+            </td>
+            <td>°C</td>
+        </tr>
+    </table>
+    <button onclick="sendSettings();">Update</button>
+</body>
+</html>
