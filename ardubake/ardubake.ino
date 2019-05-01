@@ -1,5 +1,5 @@
 // LCD_ST7032 - Version: Latest
-#include <LCD_ST7032.h>
+//#include <LCD_ST7032.h>
 
 #define READ_SIZE 200
 
@@ -10,7 +10,7 @@ const int THeatPin = 4;
 const int BHeatPin = 5;
 const int BuzzerPin = 9;
 const char Top = 255;
-LCD_ST7032 lcd;
+//LCD_ST7032 lcd;
 
 unsigned long phaseStart;
 unsigned long soakSeconds = 100;
@@ -31,7 +31,7 @@ bool stopFromSerial = LOW;
 
 void setup()
 {
-  Serial1.begin(115200);
+  Serial.begin(115200);
   Serial3.begin(115200);
   pinMode(LampPin, OUTPUT);
   pinMode(FanPin, OUTPUT);
@@ -66,12 +66,13 @@ void updateDataAndDisplay()
   String serialOut = "time:" + String(millis() / 1000) + ";tT:" + String(tcTop, 2) + ";pT:" + String(ptTop, 2) + ";tB:" + String(tcBott, 2) + ";pB:" + String(ptBott, 2) + ";phase:" + message;
   String lcdLine2 = String(Top + ":" + String(ptTop, 2) + "C" + String(tcTop, 2) + "C_:" + String(ptBott, 2) + "C" + String(tcBott, 2) + "C");
 
+  Serial.println(serialOut);
   Serial3.println(serialOut);
 
-  lcd.setCursor(0, 0); //LINE 1 ADDRESS 0
-  lcd.print(message);
-  lcd.setCursor(1, 0); //LINE 2 ADDRESS 0
-  lcd.print(lcdLine2);
+//  lcd.setCursor(0, 0); //LINE 1 ADDRESS 0
+//  lcd.print(message);
+//  lcd.setCursor(1, 0); //LINE 2 ADDRESS 0
+//  lcd.print(lcdLine2);
 }
 
 void readFromSerial()
@@ -81,7 +82,7 @@ void readFromSerial()
   //settings: soakSeconds:100;soakStartTemp:140;soakMaxTemp:160;reflowSeconds:80;reflowStartTemp:180;reflowMinTemp:205;reflowMaxTemp:220;
 
   char input[READ_SIZE + 1];
-  byte size = Serial3.readBytesUntil('\n', input, READ_SIZE);
+  byte size = Serial.readBytesUntil('\n', input, READ_SIZE);
   input[size] = 0;
 
   if (strstr(input, "Start") == input)
@@ -137,7 +138,7 @@ void readFromSerial()
 void checkSerialForAbort()
 {
   char input[READ_SIZE + 1];
-  byte size = Serial3.readBytesUntil('\n', input, READ_SIZE);
+  byte size = Serial.readBytesUntil('\n', input, READ_SIZE);
   input[size] = 0;
 
   if (strstr(input, "Stop") == input)
@@ -305,9 +306,9 @@ void loop()
   digitalWrite(THeatPin, LOW);
   digitalWrite(BHeatPin, LOW);
   noTone(BuzzerPin);
-  lcd.begin();
-  lcd.noCursor();
-  lcd.setcontrast(25);
+  //lcd.begin();
+  //lcd.noCursor();
+  //lcd.setcontrast(25);
   waitForStart();
   preheat();
   soak();
