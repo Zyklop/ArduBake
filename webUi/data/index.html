@@ -54,7 +54,7 @@
             title:'Temperature'
         };
         Plotly.newPlot('temps', data, layout);
-        document.getElementById('lblPhase').innerHTML = data.phase;
+        document.getElementById('lblPhase').innerHTML = result.phase;
     })();
 
     function sendStart() {
