@@ -22,10 +22,10 @@ float reflowStartTemp = 180.0;
 float reflowPeakMinTemp = 205.0;
 float reflowPeakMaxTemp = 220.0;
 String message = "Press Start";
-float tcTop;
-float tcBott;
-float ptTop;
-float ptBott;
+double tcTop;
+double tcBott;
+double ptTop;
+double ptBott;
 bool startFromSerial = LOW;
 bool stopFromSerial = LOW;
 
@@ -44,16 +44,16 @@ void setup()
   digitalWrite(BHeatPin, LOW);
 }
 
-float tcToTemp(int analog)
+double tcToTemp(int analog)
 {
-  float voltage = (Vin * analog) / 1024;
-  return voltage;
+  double voltage = (Vin * analog) / 1024;
+  return (voltage - 1.41) * 270;
 }
 
-float ptToTemp(int analog)
+double ptToTemp(int analog)
 {
-  float voltage = (Vin * analog) / 1024;
-  return voltage;
+  double voltage = (Vin * analog) / 1024;
+  return (2.43 - voltage) * 335;
 }
 
 void updateDataAndDisplay()
