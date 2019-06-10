@@ -10,6 +10,7 @@ const int THeatPin = 4;
 const int BHeatPin = 5;
 const int BuzzerPin = 9;
 const char Top = 255;
+const float TurnoffCompensation = 10.0;
 //LCD_ST7032 lcd;
 
 unsigned long phaseStart;
@@ -47,13 +48,13 @@ void setup()
 double tcToTemp(int analog)
 {
   double voltage = (Vin * analog) / 1024;
-  return (voltage - 1.41) * 270;
+  return (voltage - 1.35) * 210;
 }
 
 double ptToTemp(int analog)
 {
   double voltage = (Vin * analog) / 1024;
-  return (2.43 - voltage) * 335;
+  return (2.43 - voltage) * 325;
 }
 
 void updateDataAndDisplay()
@@ -166,19 +167,19 @@ void preheat()
   {
     message = String("Preheating ") + String(float(millis() - phaseStart) / 1000.0, 1) + String("s");
     updateDataAndDisplay();
-    if (tcTop > soakMaxTemp)
+    if (tcTop > soakMaxTemp - TurnoffCompensation)
     {
       digitalWrite(THeatPin, LOW);
     }
-    else
+    else if (tcTop < soakStartTemp)
     {
       digitalWrite(THeatPin, HIGH);
     }
-    if (tcBott > soakMaxTemp)
+    if (tcBott > soakMaxTemp - TurnoffCompensation)
     {
       digitalWrite(BHeatPin, LOW);
     }
-    else
+    else if (tcBott < soakStartTemp)
     {
       digitalWrite(BHeatPin, HIGH);
     }
@@ -194,19 +195,19 @@ void soak()
   {
     message = String("Soaking ") + String(float(soakSeconds) - float((millis() - phaseStart) / 1000.0), 1) + String("s");
     updateDataAndDisplay();
-    if (tcTop > soakMaxTemp)
+    if (tcTop > soakMaxTemp - TurnoffCompensation)
     {
       digitalWrite(THeatPin, LOW);
     }
-    else
+    else if (tcTop < soakStartTemp)
     {
       digitalWrite(THeatPin, HIGH);
     }
-    if (tcBott > soakMaxTemp)
+    if (tcBott > soakMaxTemp - TurnoffCompensation)
     {
       digitalWrite(BHeatPin, LOW);
     }
-    else
+    else if (tcBott < soakStartTemp)
     {
       digitalWrite(BHeatPin, HIGH);
     }
@@ -236,7 +237,7 @@ void reflow()
   {
     message = String("Reflow ") + String(float(reflowSeconds) - float((millis() - phaseStart) / 1000.0), 1) + String("s");
     updateDataAndDisplay();
-    if (tcTop > reflowPeakMaxTemp || ptTop > reflowPeakMinTemp)
+    if (tcTop > reflowPeakMaxTemp - TurnoffCompensation || ptTop > reflowPeakMinTemp)
     {
       digitalWrite(THeatPin, LOW);
     }
@@ -244,7 +245,7 @@ void reflow()
     {
       digitalWrite(THeatPin, HIGH);
     }
-    if (tcBott > reflowPeakMaxTemp || ptBott > reflowPeakMinTemp)
+    if (tcBott > reflowPeakMaxTemp - TurnoffCompensation || ptBott > reflowPeakMinTemp)
     {
       digitalWrite(BHeatPin, LOW);
     }
